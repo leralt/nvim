@@ -15,3 +15,4 @@ local function map(mode, lhs, rhs, opts)
 end
 
 map("i", "jj", "<esc>", { desc = "" })
+map("n", "<c-q>", "<cmd>qa<cr>", { desc = "Quit all" })
