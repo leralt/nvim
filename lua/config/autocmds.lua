@@ -28,22 +28,52 @@ vim.diagnostic.config({
     prefix = "",
   },
 })
-
+-- 为诊断信息添加透明背景 && change backgroud color
+DiagBack = function()
+  local _, winnr = vim.diagnostic.open_float(nil, { focusable = false })
+  if winnr then
+    vim.api.nvim_win_set_option(winnr, "winblend", 20)
+    vim.api.nvim_win_set_option(winnr, "winhl", "Normal:NormalFloatLSP,NormalFloat:NormalFloatLSP")
+  end
+end
+-- vim.cmd([[
+--   set signcolumn=yes
+--   autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
+-- ]])
 vim.cmd([[
   set signcolumn=yes
-  autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
+  autocmd CursorHold * lua DiagBack()
 ]])
 
-local border = "rounded"
--- local border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
-vim.opt.completeopt = { "menu", "noinsert", "noinsert" }
 -- LSP settings (for overriding per client)
+local function customise_handler(handler)
+  local overrides = { border = "rounded" }
+  return vim.lsp.with(function(...)
+    local _, winnr = handler(...)
+    if winnr then
+      -- vim.api.nvim_win_set_option(winnr, "winblend", 20)
+      vim.api.nvim_win_set_option(winnr, "winhl", "Normal:NormalFloatLSP,NormalFloat:NormalFloatLSP")
+    end
+  end, overrides)
+end
+
+-- local handlers = {
+--   ["textDocument/hover"] = vim.lsp.with(
+--     vim.lsp.handlers.hover,
+--     { border = border, bg = "#282923", Normal = "NormalFloatLSP", title = "zhushi" }
+--   ),
+--   ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
+-- }
 local handlers = {
-  ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
-  ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
+  ["textDocument/hover"] = customise_handler(vim.lsp.handlers.hover),
+  ["textDocument/signatureHelp"] = customise_handler(vim.lsp.handlers.signature_help),
 }
---
+-- vim.lsp.handlers["textDocument/hover"] = customise_handler(vim.lsp.handlers.hover)
+-- vim.lsp.handlers["textDocument/signatureHelp"] = customise_handler(vim.lsp.handlers.signature_help)
+
 -- -- Do not forget to use the on_attach function
 -- -- require("lspconfig").util.on_setup({ handlers = handlers })
 require("lspconfig").clangd.setup({ handlers = handlers })
 require("lspconfig").lua_ls.setup({ handlers = handlers })
+require("lspconfig").pyright.setup({ handlers = handlers })
+-- require("lspconfig").rust_analyzer.setup({ handlers = handlers })

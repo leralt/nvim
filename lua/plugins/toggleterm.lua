@@ -5,6 +5,7 @@ return {
       require("toggleterm").setup({
         size = 15,
         -- direction = "horizontal",
+        -- start_in_insert = true,
         direction = "float",
         open_mapping = [[<c-\>]],
       })
