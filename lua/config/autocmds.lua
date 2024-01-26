@@ -76,4 +76,5 @@ local handlers = {
 require("lspconfig").clangd.setup({ handlers = handlers })
 require("lspconfig").lua_ls.setup({ handlers = handlers })
 require("lspconfig").pyright.setup({ handlers = handlers })
+require("lspconfig").gopls.setup({ handlers = handlers })
 -- require("lspconfig").rust_analyzer.setup({ handlers = handlers })
